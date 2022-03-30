@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { addToDb, getStoredCart } from '../../utilities/fakedb';
 import Meal from '../Meal/Meal';
 import OrderList from '../OrderList/OrderList';
 import './Restaurant.css';
@@ -12,10 +13,20 @@ const Restaurant = () => {
             .then(res => res.json())
             .then(data => setMeals(data.meals));
     }, []);
+    useEffect(() => {
+        const storedOrder = getStoredCart()
+        let newStoredMeal = []
+        for (const id in storedOrder) {
+            const previousMeal = meals.find(meal => id === meal.strMeal)
+            newStoredMeal.push(previousMeal)
+        }
+        setOrders(newStoredMeal)
+    }, [meals])
     
     const makeOrder = meal => {
         const newOrder = [...orders, meal]
         setOrders(newOrder)
+        addToDb(meal.strMeal)
     }
     
     return (
